@@ -34,11 +34,3 @@ flutter:
           fonts:
               - asset: assets/fonts/Cera-Pro-Medium.otf
               - asset: assets/fonts/Cera-Pro-Bold.otf
-
-        - family: Luckiest_Guy
-          fonts:
-              - asset: asset/fonts/Luckiest_Guy/LuckiestGuy-Regular.ttf
-
-        - family: Lora
-          fonts:
-              - asset: asset/fonts/Lora/Lora-VariableFont_wght.ttf

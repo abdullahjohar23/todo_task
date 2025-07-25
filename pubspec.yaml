@@ -16,6 +16,7 @@ dependencies:
     dotted_border: ^3.1.0
     flex_color_picker: ^3.7.1
     firebase_core: ^3.15.2
+    firebase_auth: ^5.7.0
 
 dev_dependencies:
     flutter_test:

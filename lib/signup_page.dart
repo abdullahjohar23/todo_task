@@ -26,10 +26,29 @@ class _SignUpPageState extends State<SignUpPage> {
     }
 
     Future<void> createUserWithEmailAndPassword() async {
-        final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: emailController.text.trim(),
-            password: passwordController.text.trim(),
-        );
+        try {
+            final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                email: emailController.text.trim(),
+                password: passwordController.text.trim(),
+            );
+
+            // Show success message using a SnackBar
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text('Account created successfully!'), // Success message
+                    backgroundColor: Colors.green, // Green background for success
+                    duration: Duration(seconds: 3), // Show for 2 seconds
+                ),
+            );
+        } on FirebaseAuthException catch (e) { // Handle specific Firebase authentication errors            
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(e.message ?? 'An error occurred'),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 3),
+                ),
+            );
+        }
     }
 
     @override

@@ -57,7 +57,26 @@ class MyApp extends StatelessWidget {
                 ),
             ),
 
-            home: FirebaseAuth.instance.currentUser != null ? const MyHomePage() : SignUpPage(),
+            // "FirebaseAuth.instance.currentUser" is synchronous, it's not real time
+            // home: FirebaseAuth.instance.currentUser != null ? const MyHomePage() : SignUpPage(),
+            
+            // Stream is asynchronous i.e. continuous real time value - whever the user updates to sign in or sign out
+            // now we can have real time update
+            home: StreamBuilder(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                        child: CircularProgressIndicator(),
+                    );
+                }
+
+                if (snapshot.data != null) { // meaning we are logged in
+                    return const MyHomePage();
+                }
+                return SignUpPage();
+              }
+            ),
         );
     }
 }

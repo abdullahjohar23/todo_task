@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
+import 'package:todo_task/utils.dart';
 
 class AddNewTask extends StatefulWidget {
     const AddNewTask({super.key});
@@ -22,6 +25,36 @@ class _AddNewTaskState extends State<AddNewTask> {
         titleController.dispose();
         descriptionController.dispose();
         super.dispose();
+    }
+
+    Future<void> uploadTaskToDb() async {
+        try {
+            /*final data = */ // uncomment this is you want access of data
+            await FirebaseFirestore.instance.collection('tasks').add({
+                'title': titleController.text.trim(),
+                'description': descriptionController.text.trim(),
+                'date': selectedDate,
+                'postedAt': FieldValue.serverTimestamp(),
+                'color': rgbToHex(_selectedColor),
+            });
+
+            // Show added message using a SnackBar
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text('Added Successfully!'), // Success message
+                    backgroundColor: Colors.green, // Green background for success
+                    duration: Duration(seconds: 3), // Show for 2 seconds
+                ),
+            );
+        } on FirebaseAuthException catch (e) { // Handle specific Firebase authentication errors            
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(e.message ?? 'An error occurred'),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 3),
+                ),
+            );
+        }
     }
 
     @override
@@ -134,7 +167,9 @@ class _AddNewTaskState extends State<AddNewTask> {
                             const SizedBox(height: 10),
                             
                             ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                    await uploadTaskToDb();
+                                },
                                 child: const Text(
                                     'SUBMIT',
                                     style: TextStyle(

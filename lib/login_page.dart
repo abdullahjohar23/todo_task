@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:todo_task/home_page.dart';
 import 'package:todo_task/signup_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
     static route() => MaterialPageRoute(
@@ -22,6 +24,39 @@ class _LoginPageState extends State<LoginPage> {
         emailController.dispose();
         passwordController.dispose();
         super.dispose();
+    }
+
+    Future<void> loginWithEmailAndPassword() async {
+        try {
+            /*final userCredential = */ // uncomment this is you want access of user credentials
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
+                email: emailController.text.trim(),
+                password: passwordController.text.trim(),
+            );
+
+            // Show success message using a SnackBar
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text('Logged In Successfully!'), // Success message
+                    backgroundColor: Colors.green, // Green background for success
+                    duration: Duration(seconds: 3), // Show for 2 seconds
+                ),
+            );
+
+            // Navigate to Home Page
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage()),
+            );
+        } on FirebaseAuthException catch (e) { // Handle specific Firebase authentication errors            
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(e.message ?? 'An error occurred'),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 3),
+                ),
+            );
+        }
     }
 
     @override
@@ -68,7 +103,10 @@ class _LoginPageState extends State<LoginPage> {
                             const SizedBox(height: 20),
                             
                             ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                    await loginWithEmailAndPassword();
+                                },
+                                
                                 child: const Text(
                                     'SIGN IN',
                                     style: TextStyle(

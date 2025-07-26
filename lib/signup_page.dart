@@ -27,7 +27,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
     Future<void> createUserWithEmailAndPassword() async {
         try {
-            final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            /*final userCredential = */ // uncomment this is you want access of user credentials
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
                 email: emailController.text.trim(),
                 password: passwordController.text.trim(),
             );

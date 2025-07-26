@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_task/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpPage extends StatefulWidget {
     static route() => MaterialPageRoute(
@@ -22,6 +23,13 @@ class _SignUpPageState extends State<SignUpPage> {
         emailController.dispose();
         passwordController.dispose();
         super.dispose();
+    }
+
+    Future<void> createUserWithEmailAndPassword() async {
+        final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+        );
     }
 
     @override
@@ -67,7 +75,9 @@ class _SignUpPageState extends State<SignUpPage> {
                             const SizedBox(height: 20),
                             
                             ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                    await createUserWithEmailAndPassword();
+                                },
                                 child: const Text(
                                     'SIGN UP',
                                     style: TextStyle(

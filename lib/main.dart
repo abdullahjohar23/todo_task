@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_task/firebase_options.dart';
+import 'package:todo_task/home_page.dart';
 import 'package:todo_task/signup_page.dart';
 
 Future<void> main() async {
@@ -55,7 +57,7 @@ class MyApp extends StatelessWidget {
                 ),
             ),
 
-            home: SignUpPage(),
+            home: FirebaseAuth.instance.currentUser != null ? const MyHomePage() : SignUpPage(),
         );
     }
 }

@@ -44,8 +44,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                         const DateSelector(),
                         
-                        FutureBuilder(
-                            future: FirebaseFirestore.instance.collection('tasks').get(),
+                        // FutureBuilder(
+                        //     future: FirebaseFirestore.instance.collection('tasks').get(),
+
+                        // before it was FutureBuilder, you can see the above 2 lines
+                        // FutureBuilder was non real time but StreamBuilder is real time
+
+                        StreamBuilder(
+                            stream: FirebaseFirestore.instance.collection('tasks').snapshots(),
                             builder: (context, snapshot) {
                                 if (snapshot.connectionState == ConnectionState.waiting) {
                                     return const Center(

@@ -34,6 +34,7 @@ class _AddNewTaskState extends State<AddNewTask> {
                 'title': titleController.text.trim(),
                 'description': descriptionController.text.trim(),
                 'date': selectedDate,
+                'creator': FirebaseAuth.instance.currentUser!.uid, // this line is to fethc only the data of a single user. this is generate a id matching with the id in the authentication in firebase
                 'postedAt': FieldValue.serverTimestamp(),
                 'color': rgbToHex(_selectedColor),
             });

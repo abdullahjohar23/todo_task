@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                             width: 50,
                                                             decoration: BoxDecoration(
                                                                 color: strengthenColor(
-                                                                    const Color.fromRGBO(246, 222, 194, 1),
+                                                                    hexToColor(taskData['color']), // matching the color with card color that a user will choose
                                                                     0.69,
                                                                 ),
                                                                 shape: BoxShape.circle,

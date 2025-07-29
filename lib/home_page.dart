@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:todo_task/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -50,9 +51,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
                         // before it was FutureBuilder, you can see the above 2 lines
                         // FutureBuilder was non real time but StreamBuilder is real time
-
+                        
                         StreamBuilder(
-                            stream: FirebaseFirestore.instance.collection('tasks').where('creator', isEqualTo: FirebaseAuth.instance.currentUser!.uid).snapshots(), // ".where('creator', isEqualTo: FirebaseAuth.instance.currentUser!.uid)" is added to fetch the data of a single user
+                            stream: FirebaseFirestore.instance.collection('tasks').where('creator', isEqualTo: FirebaseAuth.instance.currentUser!.uid).snapshots(),
                             builder: (context, snapshot) {
                                 if (snapshot.connectionState == ConnectionState.waiting) {
                                     return const Center(
@@ -68,6 +69,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                     child: ListView.builder(
                                         itemCount: snapshot.data!.docs.length,
                                         itemBuilder: (context, index) {
+                                            final taskData = snapshot.data!.docs[index].data();
+
+                                            // if you want to make it understandable
+                                            // final timestamp = taskData['date'];
+                                            // final dateTime = timestamp.toDate();
+                                            // final formattedTime = DateFormat('hh:mm a').format(dateTime); // DateFormat is from intl package
+                                            final formattedTime = DateFormat('hh:mm a').format(taskData['date'].toDate()); // DateFormat is from intl package
+                                            
                                             return Dismissible(
                                                 key: ValueKey(index),
                                                 onDismissed: (direction) {
@@ -80,10 +89,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     children: [
                                                         Expanded(
                                                             child: TaskCard(
-                                                                color: hexToColor(snapshot.data!.docs[index].data()['color'],),
-                                                                headerText: snapshot.data!.docs[index].data()['title'],
-                                                                descriptionText: snapshot.data!.docs[index].data()['description'],
-                                                                scheduledDate: snapshot.data!.docs[index].data()['date'].toString(),
+                                                                color: hexToColor(taskData['color']),
+                                                                headerText: taskData['title'],
+                                                                descriptionText: taskData['description'],
+                                                                scheduledDate: DateFormat('dd MMM yyyy').format(taskData['date'].toDate()),
                                                             ),
                                                         ),
                                                         
@@ -99,11 +108,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                                             ),
                                                         ),
                                                         
-                                                        const Padding(
-                                                            padding: EdgeInsets.all(12.0),
+                                                        Padding(
+                                                            padding: const EdgeInsets.all(12.0),
                                                             child: Text(
-                                                                '10:00AM',
-                                                                style: TextStyle(
+                                                                formattedTime,
+                                                                style: const TextStyle(
                                                                     fontSize: 17,
                                                                 ),
                                                             ),
@@ -114,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         },
                                     ),
                                 );
-                            }
+                            },
                         ),
                     ],
                 ),

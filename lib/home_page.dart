@@ -16,6 +16,28 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+    Future<void> signOut() async {
+        try {
+            await FirebaseAuth.instance.signOut();
+            
+            // Optional: Show confirmation message
+            ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Signed out successfully'),
+                    duration: Duration(seconds: 2),
+                    backgroundColor: Colors.green,
+                ),
+            );
+        } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text('Error signing out: ${e.toString()}'),
+                    duration: const Duration(seconds: 2),
+                ),
+            );
+        }
+    }
+
     @override
     Widget build(BuildContext context) {
         return Scaffold(
@@ -126,6 +148,22 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                         ),
                     ],
+                ),
+            ),
+
+            floatingActionButton: Padding(
+                padding: EdgeInsets.only(bottom: 30, right: 20),
+                child: FloatingActionButton(
+                    backgroundColor: Colors.deepOrange,
+                    onPressed: (() {
+                        signOut();
+                    }),
+                    
+                    child: Icon(
+                        Icons.login_rounded,
+                        color: Colors.white,
+                        size: 30,
+                    ),
                 ),
             ),
         );

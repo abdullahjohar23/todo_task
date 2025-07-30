@@ -105,13 +105,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             stream: FirebaseFirestore.instance.collection('tasks').where('creator', isEqualTo: FirebaseAuth.instance.currentUser!.uid).snapshots(),
                             builder: (context, snapshot) {
                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return const Center(
-                                        child: CircularProgressIndicator(),
-                                    );
+                                    return const Center(child: CircularProgressIndicator());
                                 }
 
-                                if (!snapshot.hasData) {
-                                    return const Text('No Data Here!');
+                                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                                    return const Center(child: Text('No Tasks Found!'));
                                 }
 
                                 return Expanded(
@@ -119,21 +117,54 @@ class _MyHomePageState extends State<MyHomePage> {
                                         itemCount: snapshot.data!.docs.length,
                                         itemBuilder: (context, index) {
                                             final taskData = snapshot.data!.docs[index].data();
-
+                                            
                                             // if you want to make it understandable
                                             // final timestamp = taskData['date'];
                                             // final dateTime = timestamp.toDate();
-                                            // final formattedTime = DateFormat('hh:mm a').format(dateTime); // DateFormat is from intl package
-                                            final formattedTime = DateFormat('hh:mm a').format(taskData['date'].toDate()); // DateFormat is from intl package
+                                            // final formattedTime = DateFormat('hh:mm a').format(dateTime);
                                             
+                                            final formattedTime = DateFormat('hh:mm a').format(taskData['date'].toDate()); // DateFormat is from intl package
+
                                             return Dismissible(
-                                                key: ValueKey(index),
-                                                onDismissed: (direction) {
+                                                key: ValueKey(snapshot.data!.docs[index].id),
+                                                direction: DismissDirection.endToStart,
+                                                background: Container(
+                                                    color: Colors.red,
+                                                    alignment: Alignment.centerRight,
+                                                    padding: const EdgeInsets.only(right: 20),
+                                                    child: const Icon(Icons.delete, color: Colors.white),
+                                                ),
+                                                
+                                                confirmDismiss: (direction) async {
                                                     if (direction == DismissDirection.endToStart) {
-                                                        FirebaseFirestore.instance.collection('tasks').doc(snapshot.data!.docs[index].id).delete();
+                                                        return await showDialog(
+                                                            context: context,
+                                                            builder: (context) => AlertDialog(
+                                                                title: const Text('Delete Task'),
+                                                                content: const Text('Are you sure you want to delete this task?'),
+                                                                actions: [
+                                                                    TextButton(
+                                                                        onPressed: () => Navigator.of(context).pop(false),
+                                                                        child: const Text('Cancel', style: TextStyle(color: Colors.deepOrange),),
+                                                                    ),
+                                                                    
+                                                                    TextButton(
+                                                                        onPressed: () => Navigator.of(context).pop(true),
+                                                                        child: const Text('Delete', style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold),),
+                                                                    ),
+                                                                ],
+                                                            ),
+                                                        );
                                                     }
+                                                    
+                                                    return false;
                                                 },
                                                 
+                                                onDismissed: (direction) async {
+                                                    final docId = snapshot.data!.docs[index].id;
+                                                    await FirebaseFirestore.instance.collection('tasks').doc(docId).delete();
+                                                },
+
                                                 child: Row(
                                                     children: [
                                                         Expanded(
@@ -150,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                             width: 50,
                                                             decoration: BoxDecoration(
                                                                 color: strengthenColor(
-                                                                    hexToColor(taskData['color']), // matching the color with card color that a user will choose
+                                                                    hexToColor(taskData['color']),
                                                                     0.69,
                                                                 ),
                                                                 shape: BoxShape.circle,
@@ -161,9 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                             padding: const EdgeInsets.all(12.0),
                                                             child: Text(
                                                                 formattedTime,
-                                                                style: const TextStyle(
-                                                                    fontSize: 17,
-                                                                ),
+                                                                style: const TextStyle(fontSize: 17),
                                                             ),
                                                         ),
                                                     ],
@@ -178,10 +207,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
             ),
 
+            // logout button
             floatingActionButton: Padding(
                 padding: EdgeInsets.only(bottom: 30, right: 20),
+                
                 child: FloatingActionButton(
                     backgroundColor: Colors.deepOrange,
+                    
                     onPressed: (() {
                         signOut();
                     }),

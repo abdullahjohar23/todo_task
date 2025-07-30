@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:todo_task/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:todo_task/login_page.dart';
 import 'package:todo_task/add_new_task.dart';
 import 'package:todo_task/widgets/task_card.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,24 +18,50 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
     Future<void> signOut() async {
-        try {
-            await FirebaseAuth.instance.signOut();
-            
-            // Optional: Show confirmation message
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Signed out successfully'),
-                    duration: Duration(seconds: 2),
-                    backgroundColor: Colors.green,
-                ),
-            );
-        } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content: Text('Error signing out: ${e.toString()}'),
-                    duration: const Duration(seconds: 2),
-                ),
-            );
+        bool confirm = await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                title: Text('Confirm Logout', style: TextStyle(fontWeight: FontWeight.bold),),
+                content: Text('Are you sure you want to sign out?'),
+                actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text('Cancel', style: TextStyle(color: Colors.deepOrange),),
+                    ),
+                    
+                    TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Text('Logout', style: TextStyle(color: Colors.deepOrange),),
+                    ),
+                ],
+            ),
+        );
+        
+
+        if (confirm == true) {
+            try {
+                await FirebaseAuth.instance.signOut();
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    (Route<dynamic> route) => false,
+                );
+
+                 // Optional: Show confirmation message
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Signed out successfully'),
+                        duration: Duration(seconds: 2),
+                        backgroundColor: Colors.green,
+                    ),
+                );
+            } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text('Error signing out: ${e.toString()}'),
+                        duration: const Duration(seconds: 2),
+                    ),
+                );
+            }
         }
     }
 
